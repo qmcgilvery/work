@@ -12,13 +12,14 @@ function suitelet(request, response)
   {
     //Create the form and add fields to it 
     var form = nlapiCreateForm("Suitelet - GET call" );
-    form.addField('custpage_field1', 'text', 'Name' ).setDefaultValue('Product Name' );
+    //form.addField('custpage_field1', 'text', 'Name' ).setDefaultValue('Product Name' );
     form.addField('custpage_field2', 'select', 'Employee', 'employee' );
-    form.addField('custpage_field3', 'select', 'Status', '807' );
+    //form.addField('custpage_field3', 'select', 'Status', '807' );
     form.addField('custpage_field4', 'text', 'serial num' );
     form.addField('custpage_field5', 'select', 'Condition', '813' );
     form.addField('custpage_field6', 'longtext', 'Return Notes' );
     form.addField('custpage_field7', 'longtext', 'Damage Notes' );
+    form.addField('custpage_field8', 'checkbox', 'RETURN' );
     
     
     form.addSubmitButton('Submit' );
@@ -39,7 +40,13 @@ function suitelet(request, response)
     var con			= request.getParameter('custpage_field5' );
     var rNotes		= request.getParameter('custpage_field6' );
     var dNotes		= request.getParameter('custpage_field7' ); 
-	   
+	var ret			= request.getParameter('custpage_field8' ); 
+	var d	 		= new Date();
+	var today = nlapiDateToString(d);
+		
+	nlapiLogExecution("DEBUG", "status", status); //  amount of items w matching sn
+	nlapiLogExecution("DEBUG", "condition", con); //  logs ID of first record with matching sn
+	
 	    // create search filter
 	    var searchFilters = new Array();
 		searchFilters.push(new nlobjSearchFilter("custrecord1431", null, 'is', sn)); 
@@ -53,22 +60,32 @@ function suitelet(request, response)
 		// load record of item
 		var orig 		= nlapiLoadRecord('customrecord812', results);
 		
-	// update parent record
-	var nStat 	= orig.setFieldValue('custrecord1425', status); // set value of the status
-	var nExp	= orig.setFieldValue('custrecord1424', employee); // set value of the expert
-	
-	// create child record
-	var child = nlapiCreateRecord("customrecord811");
-	
-	// set values for child record
-	child.setFieldValue('custrecord1432', results);
-	child.setFieldValue('custrecord1420', rNotes);
-	child.setFieldValue('custrecord1421', dNotes);
-	
-	// submit child, parent
-	nlapiSubmitRecord(child, null, null);
+			// Set values for checkout
+			orig.setFieldValue('custrecord1425', 2); // set value of the status
+			orig.setFieldValue('custrecord1424', employee); // set value of the expert
+			orig.setFieldValue('custrecord1426', today); // set value of the status
+		
+			// Set values for returns
+			if (ret == "T") {
+				
+				orig.setFieldValue('custrecord1425', 1); // set value of the status
+				orig.setFieldValue('custrecord1424', ''); // set value of the expert
+				// create child record
+				var child = nlapiCreateRecord("customrecord811");
+				
+				// set values for child record
+				child.setFieldValue('custrecord1418', today);
+				child.setFieldValue('custrecord1432', results);
+				child.setFieldValue('custrecord1420', rNotes);
+				child.setFieldValue('custrecord1421', dNotes);
+				
+				// submit child
+				nlapiSubmitRecord(child, null, null);
+			}
+		
+	// submit parent
 	nlapiSubmitRecord(orig, null, null);
-
+	
   }
 }
 
