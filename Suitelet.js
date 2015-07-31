@@ -1,17 +1,9 @@
-/**
- * Module Description
- * 
- * Version    Date            Author           Remarks
- * 1.00       24 Jul 2015     quentin
- *
- */
 
 /**
  * @param {nlobjRequest} request Request object
  * @param {nlobjResponse} response Response object
  * @returns {Void} Any output is written via response object
  *
-
 */
 
 function suitelet(request, response)
@@ -33,68 +25,54 @@ function suitelet(request, response)
   //POST call
   else
   {
-    //var form = nlapiCreateForm("Suitelet - POST call" );
-	
-    var SN = request.getParameter('custpage_field4' );
+    // store values from form 
+    var name 		= request.getParameter('custpage_field1' );
+    var employee 	= request.getParameter('custpage_field2' );
+    var status 		= request.getParameter('custpage_field3' );
+    var sn 			= request.getParameter('custpage_field4' );
     
-    
-    
-    
-	nlapiLogExecution("DEBUG", "Name", request.getParameter('custpage_field1' )); // logs name;
-    nlapiLogExecution("DEBUG", "Employee", request.getParameter('custpage_field2' )); // logs empl;
-    nlapiLogExecution("DEBUG", "Status", request.getParameter('custpage_field3' )); // logs status;
-    nlapiLogExecution("DEBUG", "SN", SN); // logs sn;
-    
-    var worker = request.getParameter('custpage_field2' );
+	    // log values
+		nlapiLogExecution("DEBUG", "Name", name); // name;
+	    nlapiLogExecution("DEBUG", "Employee", employee); // employee;
+	    nlapiLogExecution("DEBUG", "Status", status); // status;
+	    nlapiLogExecution("DEBUG", "SN", sn); // sn;
+	    
+    // create search filter
     var searchFilters = new Array();
-	searchFilters.push(new nlobjSearchFilter("custrecord1431", null, 'is', SN)); // sets filter: sn field is current sn
-	
-	var searchResult = nlapiSearchRecord("customrecord812", 1068, searchFilters, null); // searches for and returns item with matching sn
+	searchFilters.push(new nlobjSearchFilter("custrecord1431", null, 'is', sn)); 
+	// search for and return item with matching SN
+	var searchResult = nlapiSearchRecord("customrecord812", 1068, searchFilters, null); 
 	nlapiLogExecution("DEBUG", "to be removed", searchResult.length); //  amount of items w matching sn
 	nlapiLogExecution("DEBUG", "to be removed", searchResult[0].getId()); //  logs ID of first record with matching sn
   
-	results = searchResult[0].getId(); // stores ID of record with matching sn 	
+	// get ID of item returned from search 
+	results = searchResult[0].getId();
+	// load record of item
+	var orig 		= nlapiLoadRecord('customrecord812', results);
 	
-	var orig 		= nlapiLoadRecord('customrecord812', results); // load original record
+		// store values of item
+		var oldDate 	= orig.getFieldValue('custrecord1426');
+		var oldStatus 	= orig.getFieldValue('custrecord1425');
+		var oldExp 		= orig.getFieldText('custrecord1424'); 
+		//var oldSn 	= orig.getFieldValue('custrecord1431');
+		
+			// log values
+			nlapiLogExecution("DEBUG", "Date", oldDate); // logs old date
+			nlapiLogExecution("DEBUG", "status", oldStatus); // logs old status
+			nlapiLogExecution("DEBUG", "expert", oldExp); // logs old expert TOP
+			//nlapiLogExecution("DEBUG", "sn", oldSn); // logs old serial number
+			
+	var nStat 	= orig.setFieldValue('custrecord1425', status); // get value of the checkout date on original record
+	var nExp	= orig.setFieldValue('custrecord1424', employee); // get value of the checkout date on original record
 	
-	var oldDate 	= orig.getFieldValue('custrecord1426'); // get value of the checkout date on original record
-	var oldStatus 	= orig.getFieldValue('custrecord1425'); // get value of the checkout date on original record
-	var oldSn 		= orig.getFieldValue('custrecord1431'); // get value of the checkout date on original record
-	var oldExp 		= orig.getFieldText('custrecord1424'); // get value of the checkout date on original record
+	/*
+	var subrec = orig.createSubrecord(existingrecmachcustrecord1432);
+	subrec.setFieldValue('custrecord1420', 'something');
+	subrec.commit();
+	*/
 	
-		nlapiLogExecution("DEBUG", "Date", oldDate); // logs serial number
-		nlapiLogExecution("DEBUG", "status", oldStatus); // logs serial number
-		nlapiLogExecution("DEBUG", "sn", oldSn); // logs serial number
-		nlapiLogExecution("DEBUG", "expert", oldExp); // logs serial number
-		
-		var nStat 	= orig.setFieldValue('custrecord1425', '2'); // get value of the checkout date on original record
-		var nSn 	= orig.setFieldValue('custrecord1431', '00000'); // get value of the checkout date on original record
-		var nExp	= orig.setFieldValue('custrecord1424', worker); // get value of the checkout date on original record
-		
-		nlapiSubmitRecord(orig, null, null);
-		
-	//editSubrecord(String)
-		
-	
-	//nlapiCreateRecord(812, Object)
-	
-    /*create the fields on the form and populate them with values from the previous screen 
-    var resultField1 = form.addField('custpage_res1', 'text', 'Text Field value entered: ' );
-    resultField1.setDefaultValue(request.getParameter('custpage_field1' ));
-    resultField1.setDisplayType('inline' );
-		
-    var resultField2 = form.addField('custpage_res2', 'integer', 'Integer Field value entered: ' );
-    resultField2.setDefaultValue(request.getParameter('custpage_field2' ));
-    resultField2.setDisplayType('inline' );
-		
-    var resultField3 = form.addField('custpage_res3', 'select', 'Select Field value entered: ', 'customer' );
-    resultField3.setDefaultValue(request.getParameter('custpage_field3' ));
-    resultField3.setDisplayType('inline' );
-    */
-	message = '<html><h1>Thank You!</h1></html>'
-    response.writePage(message);
-   
-    
+	nlapiSubmitRecord(orig, null, null);
+
   }
 }
 
