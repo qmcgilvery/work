@@ -25,7 +25,7 @@ function beforeLoad(type,form)
 	}
 	
 	nlapiSetFieldValue("custentity_ad_sent_cust_to_adminpanel", "T", false);
-	
+}	
 	
 	/*
 	var adminPanelUrl = "http://samofit.com/test-page.html";
@@ -49,7 +49,7 @@ function beforeLoad(type,form)
 			
 			nlapiLogExecution("DEBUG", "Body", body);	
 			nlapiLogExecution("DEBUG", "Response", response);	
-	*/
+	
 }
 
 function beforeSubmit(type)
@@ -72,4 +72,4 @@ function afterSubmit(type)
 	var obj	 	    = JSON.stringify({ordernum:order, trackingnum:tracking});   
 	nlapiLogExecution('DEBUG','Before Load'+obj);
 }
-
+*/
