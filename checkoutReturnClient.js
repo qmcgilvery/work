@@ -14,7 +14,15 @@
  * @returns {Void}
  */
 function clientPageInit(type){
-   alert('hi!');
+   
+}
+function fieldChange(type, name)
+{
+	//  Prompt for additional information,  based on values already selected. 
+	if (nlapiGetFieldValue('custpage_field5') < '3') 
+	{
+		alert('Fill out Damage report!!!');
+	}
 }
 /*
 function onSave()
