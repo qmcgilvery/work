@@ -14,7 +14,7 @@
  * @returns {Void}
  */
 function clientPageInit(type){
-   
+	nlapiDisableField('custpage_field2', true)
 }
 function fieldChange(type, name)
 {
